@@ -4,11 +4,11 @@ enum IndicatorSide { start, end }
 
 /// A vertical tab widget for flutter
 class VerticalTabs extends StatefulWidget {
-  final Key key;
+  final Key? key;
   final int initialIndex;
   final double tabsWidth;
   final double indicatorWidth;
-  final IndicatorSide indicatorSide;
+  final IndicatorSide? indicatorSide;
   final List<Tab> tabs;
   final List<Widget> contents;
   final TextDirection direction;
@@ -23,33 +23,34 @@ class VerticalTabs extends StatefulWidget {
   final Curve changePageCurve;
   final Color tabsShadowColor;
   final double tabsElevation;
-  final Function(int tabIndex) onSelect;
-  final Color backgroundColor;
+  final Function(int tabIndex)? onSelect;
+  final Color? backgroundColor;
+  final int pageAnimationDuration;
 
   VerticalTabs(
       {this.key,
-      @required this.tabs,
-      @required this.contents,
-      this.tabsWidth = 200,
-      this.indicatorWidth = 3,
-      this.indicatorSide,
-      this.initialIndex = 0,
-      this.direction = TextDirection.ltr,
-      this.indicatorColor = Colors.green,
-      this.disabledChangePageFromContentView = false,
-      this.contentScrollAxis = Axis.horizontal,
-      this.selectedTabBackgroundColor = const Color(0x1100ff00),
-      this.tabBackgroundColor = const Color(0xfff8f8f8),
-      this.selectedTabTextStyle = const TextStyle(color: Colors.black),
-      this.tabTextStyle = const TextStyle(color: Colors.black38),
-      this.changePageCurve = Curves.easeInOut,
-      this.changePageDuration = const Duration(milliseconds: 300),
-      this.tabsShadowColor = Colors.black54,
-      this.tabsElevation = 2.0,
-      this.onSelect,
-      this.backgroundColor})
-      : assert(
-            tabs != null && contents != null && tabs.length == contents.length),
+        required this.tabs,
+        required this.contents,
+        this.tabsWidth = 200,
+        this.indicatorWidth = 3,
+        this.indicatorSide,
+        this.initialIndex = 0,
+        this.direction = TextDirection.ltr,
+        this.indicatorColor = Colors.green,
+        this.disabledChangePageFromContentView = false,
+        this.contentScrollAxis = Axis.horizontal,
+        this.selectedTabBackgroundColor = const Color(0x1100ff00),
+        this.tabBackgroundColor = const Color(0xfff8f8f8),
+        this.selectedTabTextStyle = const TextStyle(color: Colors.black),
+        this.tabTextStyle = const TextStyle(color: Colors.black38),
+        this.changePageCurve = Curves.easeInOut,
+        this.changePageDuration = const Duration(milliseconds: 300),
+        this.tabsShadowColor = Colors.black54,
+        this.tabsElevation = 2.0,
+        this.onSelect,
+        this.backgroundColor,
+      this.pageAnimationDuration = 400,})
+      : assert(tabs.length == contents.length),
         super(key: key);
 
   @override
@@ -58,12 +59,12 @@ class VerticalTabs extends StatefulWidget {
 
 class _VerticalTabsState extends State<VerticalTabs>
     with TickerProviderStateMixin {
-  int _selectedIndex;
-  bool _changePageByTapView;
+  late int _selectedIndex;
+  bool? _changePageByTapView;
 
-  AnimationController animationController;
-  Animation<double> animation;
-  Animation<RelativeRect> rectAnimation;
+  late AnimationController animationController;
+  late Animation<double> animation;
+  late Animation<RelativeRect> rectAnimation;
 
   PageController pageController = PageController();
 
@@ -76,7 +77,7 @@ class _VerticalTabsState extends State<VerticalTabs>
     _selectedIndex = widget.initialIndex;
     for (int i = 0; i < widget.tabs.length; i++) {
       animationControllers.add(AnimationController(
-        duration: const Duration(milliseconds: 400),
+        duration: Duration(milliseconds: widget.pageAnimationDuration),
         vsync: this,
       ));
     }
@@ -86,7 +87,7 @@ class _VerticalTabsState extends State<VerticalTabs>
       pageScrollPhysics = NeverScrollableScrollPhysics();
 
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
       pageController.jumpToPage(widget.initialIndex);
       setState(() {});
     });
@@ -128,7 +129,7 @@ class _VerticalTabsState extends State<VerticalTabs>
 
                           Widget child;
                           if (tab.child != null) {
-                            child = tab.child;
+                            child = tab.child!;
                           } else {
                             child = Container(
                                 padding: EdgeInsets.all(10),
@@ -136,24 +137,24 @@ class _VerticalTabsState extends State<VerticalTabs>
                                   children: <Widget>[
                                     (tab.icon != null)
                                         ? Row(
-                                            children: <Widget>[
-                                              tab.icon,
-                                              SizedBox(
-                                                width: 5,
-                                              )
-                                            ],
-                                          )
+                                      children: <Widget>[
+                                        tab.icon!,
+                                        SizedBox(
+                                          width: 5,
+                                        )
+                                      ],
+                                    )
                                         : Container(),
                                     (tab.text != null)
                                         ? Container(
-                                            width: widget.tabsWidth - 50,
-                                            child: Text(
-                                              tab.text,
-                                              softWrap: true,
-                                              style: _selectedIndex == index
-                                                  ? widget.selectedTabTextStyle
-                                                  : widget.tabTextStyle,
-                                            ))
+                                        width: widget.tabsWidth - 50,
+                                        child: Text(
+                                          tab.text!,
+                                          softWrap: true,
+                                          style: _selectedIndex == index
+                                              ? widget.selectedTabTextStyle
+                                              : widget.tabTextStyle,
+                                        ))
                                         : Container(),
                                   ],
                                 ));
@@ -163,15 +164,15 @@ class _VerticalTabsState extends State<VerticalTabs>
                           if (_selectedIndex == index)
                             itemBGColor = widget.selectedTabBackgroundColor;
 
-                          double left, right;
+                          double? left, right;
                           if (widget.direction == TextDirection.rtl) {
                             left = (widget.indicatorSide == IndicatorSide.end)
                                 ? 0
                                 : null;
                             right =
-                                (widget.indicatorSide == IndicatorSide.start)
-                                    ? 0
-                                    : null;
+                            (widget.indicatorSide == IndicatorSide.start)
+                                ? 0
+                                : null;
                           } else {
                             left = (widget.indicatorSide == IndicatorSide.start)
                                 ? 0
@@ -271,8 +272,8 @@ class _VerticalTabsState extends State<VerticalTabs>
     }
     animationControllers[index].forward();
 
-    if (widget.onSelect != null) {
-      widget.onSelect(_selectedIndex);
+    if(widget.onSelect != null) {
+      widget.onSelect!(_selectedIndex);
     }
   }
 }

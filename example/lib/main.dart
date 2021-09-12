@@ -72,6 +72,7 @@ class Home extends StatelessWidget {
                               })
                       ),
                     ],
+                    contentScrollAxis: Axis.vertical,
                   ),
 
 
